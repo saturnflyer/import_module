@@ -25,7 +25,7 @@ module Import_Module
     def update(c)
       d = c.dup
       @source.methods.__each__ do |meth|
-	d[meth] = @mod
+        d[meth] = @mod
       end
       d
     end
@@ -34,11 +34,11 @@ module Import_Module
       mod = @mod
       target = @target
       @source.methods.__each__ do |meth|
-	@klass.module_eval do
-	  alias_method meth, Import_Module.name(meth, mod)
-	  protected(meth) if target.protecteds.include?(meth)
-	  private(meth) if target.privates.include?(meth)
-	end
+        @klass.module_eval do
+          alias_method meth, Import_Module.name(meth, mod)
+          protected(meth) if target.protecteds.include?(meth)
+          private(meth) if target.privates.include?(meth)
+        end
       end
     end
 
@@ -46,13 +46,13 @@ module Import_Module
       orig_methods = @target.orig_methods
       d = @target.stack.current
       c.__each__ do |meth, mod|
-	@klass.module_eval do
-	  if m = d[meth] || orig_methods[meth] && :orig
-	    alias_method meth, Import_Module.name(meth, m)
-	  else
-	    undef_method meth
-	  end
-	end
+        @klass.module_eval do
+          if m = d[meth] || orig_methods[meth] && :orig
+            alias_method meth, Import_Module.name(meth, m)
+          else
+            undef_method meth
+          end
+        end
       end
     end
   end

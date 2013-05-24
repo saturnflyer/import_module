@@ -6,10 +6,10 @@
 #
 #  Ver. 0.78
 #    beta1: adopt ruby-1.8.0
-#    beta2: 
-#    beta3: 
-#    beta4: 
-#    beta5: 
+#    beta2:
+#    beta3:
+#    beta4:
+#    beta5:
 #
 #  2003.04.30
 #
@@ -60,22 +60,26 @@ module Import_Module
     def import_module(mod)
       scope = adopt_module(mod) #not upper compatible
       if block_given?
-	begin
-	  yield
-	ensure
-	  scope.pop
-	end
+        begin
+          yield
+        ensure
+          scope.pop
+        end
       end
     end
-    
+
     def adopt_module(mod)
       sw = Thread.critical or Thread.critical = true # this 'or' is safe
+
       unless scope = (@__IMPORT_MODULE_PREFIX_scopes ||= {})[mod.object_id]
-	scope = Scope.create(self, mod)
-	@__IMPORT_MODULE_PREFIX_scopes[mod.object_id] = scope
+        scope = Scope.create(self, mod)
+        @__IMPORT_MODULE_PREFIX_scopes[mod.object_id] = scope
       end
+
       scope.push
+
       Thread.critical = sw
+
       scope
     end
 
@@ -124,9 +128,9 @@ module Import_Module
     def activate
       push
       begin
-	yield
+        yield
       ensure
-	pop
+        pop
       end
     end
 
@@ -156,14 +160,14 @@ module Import_Module
 
     def set_meth_no
       @source.methods.__each__ do |meth|
-	@target.meth_no[meth] || @target.meth_no[meth] = (@@cm_no += 1)
+        @target.meth_no[meth] || @target.meth_no[meth] = (@@cm_no += 1)
       end
     end
 
     def update(c)
       d = c.dup
       @source.methods.__each__ do |meth|
-	d[@target.meth_no[meth]] = @mod.object_id
+        d[@target.meth_no[meth]] = @mod.object_id
       end
       d
     end
@@ -172,9 +176,9 @@ module Import_Module
       # Define new methods in the target class
       t = ""
       @source.methods.__each__ do |meth|
-	puts "#{@klass}> def #{meth}(#{@source.param(meth)})" if $IMPORT_MODULE_debug
-	s, = method_code(meth)
-	t << s
+        puts "#{@klass}> def #{meth}(#{@source.param(meth)})" if $IMPORT_MODULE_debug
+        s, = method_code(meth)
+        t << s
       end
       @klass.module_eval t
     end
@@ -187,9 +191,9 @@ module Import_Module
       s << "  modid = Thread.current.__IMPORT_MODULE_PREFIX_proxy[#{no}]\n"
       i = 0
       @target.scopes.each_key do |mod|
-	s << (i == 0 ? "  " : "  els") << "if modid == #{mod.object_id}\n"
-	s << "    #{Import_Module.name(meth, mod)}(#{param})\n"
-	i += 1
+        s << (i == 0 ? "  " : "  els") << "if modid == #{mod.object_id}\n"
+        s << "    #{Import_Module.name(meth, mod)}(#{param})\n"
+        i += 1
       end
       s << "  else\n" if i > 0
       s << "    #{Import_Module.name(meth, :orig)}(#{param})\n"
@@ -207,14 +211,14 @@ module Import_Module
     attr_accessor :klass, :stack
     attr_accessor :orig_methods, :saved_methods
     attr_accessor :publics, :privates, :protecteds
-    
+
     def self.enclose(klass)
       s = self
       klass.instance_eval do
-	@__IMPORT_MODULE_PREFIX_target ||= s.new(klass)
+        @__IMPORT_MODULE_PREFIX_target ||= s.new(klass)
       end
     end
-    
+
     def initialize(klass)
       @scopes = {}
       @meth_no = {}
@@ -234,21 +238,21 @@ module Import_Module
     def def_orig_methods(meths, pub_sw = false)
       # Store original methods of the root class
       @klass.module_eval do
-	meths.__each__ do |meth|
-	  meth0 = Import_Module.name(meth, :orig)
-	  alias_method meth0, meth
-	  public meth0 if pub_sw
-	end
+        meths.__each__ do |meth|
+          meth0 = Import_Module.name(meth, :orig)
+          alias_method meth0, meth
+          public meth0 if pub_sw
+        end
       end
     end
 
     def get_orig_methods(source)
       meths = []
       source.methods.__each__ do |meth|
-	if @orig_methods[meth] && !@saved_methods[meth]
-	  @saved_methods[meth] = true
-	  meths.push meth
-	end
+        if @orig_methods[meth] && !@saved_methods[meth]
+          @saved_methods[meth] = true
+          meths.push meth
+        end
       end
       meths
     end
@@ -257,13 +261,13 @@ module Import_Module
 
     def resist_orig_methods
       @publics.__each__ do |x|
-	@orig_methods[x] = true
+        @orig_methods[x] = true
       end
       @protecteds.__each__ do |x|
-	@orig_methods[x] = true
+        @orig_methods[x] = true
       end
       @privates.__each__ do |x|
-	@orig_methods[x] = true
+        @orig_methods[x] = true
       end
     end
   end
@@ -274,8 +278,7 @@ module Import_Module
     def self.enclose(mod)
       s = self
       mod.instance_eval do
-	@__IMPORT_MODULE_PREFIX_source or
-	   @__IMPORT_MODULE_PREFIX_source = s.new(mod)
+        @__IMPORT_MODULE_PREFIX_source or @__IMPORT_MODULE_PREFIX_source = s.new(mod)
       end
     end
 
@@ -292,22 +295,22 @@ module Import_Module
     def param(meth)
       s = ""
       if (n = @mod.instance_method(meth).arity) >= 0
-	n.times do |i| s << "x#{i}, " end
-	s << "&b"
+        n.times do |i| s << "x#{i}, " end
+        s << "&b"
       else
-	(-n-1).times do |i| s << "x#{i}, " end
-	s << "*a, &b"
+        (-n-1).times do |i| s << "x#{i}, " end
+        s << "*a, &b"
       end
     end
 
     def param0(meth)
       s = ""
       if (n = @mod.instance_method(meth).arity) >= 0
-	n.times do |i| s << "x#{i}, " end
-	s << "b"
+        n.times do |i| s << "x#{i}, " end
+        s << "b"
       else
-	(-n-1).times do |i| s << "x#{i}, " end
-	s << "a, b"
+        (-n-1).times do |i| s << "x#{i}, " end
+        s << "a, b"
       end
     end
 
@@ -325,13 +328,13 @@ module Import_Module
       # Store Soruce methods
       methods = @methods
       @mod.module_eval do
-	methods.__each__ do |meth|
-	  meth0 = Import_Module.name(meth, self)
-	  unless method_defined? meth0
-	    alias_method meth0, meth
-	    public meth0 if true
-	  end
-	end
+        methods.__each__ do |meth|
+          meth0 = Import_Module.name(meth, self)
+          unless method_defined? meth0
+            alias_method meth0, meth
+            public meth0 if true
+          end
+        end
       end
     end
   end
@@ -367,6 +370,7 @@ module Import_Module
     end
 
     private
+
     def export_current
       Thread.current.__IMPORT_MODULE_PREFIX_proxy = current
     end
@@ -385,11 +389,11 @@ end
 
 class << Thread
   alias new_org new
-  
+
   def new(*opts, &b)
     Thread.new_org(Thread.current, *opts) do |parent, *opts|
       Thread.current.__IMPORT_MODULE_PREFIX_stack =
-	parent.__IMPORT_MODULE_PREFIX_stack.dup
+  parent.__IMPORT_MODULE_PREFIX_stack.dup
       yield *opts
     end
   end
@@ -397,8 +401,7 @@ class << Thread
   alias fork new
 end
 
-Thread.current.__IMPORT_MODULE_PREFIX_stack =
-  Import_Module::Stack.new([Array.new])
+Thread.current.__IMPORT_MODULE_PREFIX_stack = Import_Module::Stack.new([Array.new])
 #  Import_Module::Stack.new([Hash.new])
 
 class Object
