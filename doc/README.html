@@ -1,0 +1,294 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html 
+  PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Style-Type" content="text/css" />
+<link rel="stylesheet" type="text/css" href="../doc/style.css" />
+<title>README.rd</title>
+</head>
+<body>
+<h1><a name="label-0" id="label-0">import-module</a></h1><!-- RDLabel: "import-module" -->
+<p>2005.02.02</p>
+<ul>
+<li>Version: 0.82</li>
+<li>Author: Shin-ichiro HARA</li>
+<li>e-mail: sinara@blade.nagaokaut.ac.jp</li>
+<li>Home Page: <a href="http://blade.nagaokaut.ac.jp/~sinara/ruby/import-module/">&lt;URL:http://blade.nagaokaut.ac.jp/~sinara/ruby/import-module/&gt;</a></li>
+</ul>
+<h2><a name="label-1" id="label-1">Introduction</a></h2><!-- RDLabel: "Introduction" -->
+<p>"import-module" enables to incude modules dynamically</p>
+<h2><a name="label-2" id="label-2">Installation</a></h2><!-- RDLabel: "Installation" -->
+<p>If you have a unix-like system, do:</p>
+<pre>ruby install.rb</pre>
+<p>You can also install it copying lib/*.rb to the directory where Ruby can load.</p>
+<h2><a name="label-3" id="label-3">Usage</a></h2><!-- RDLabel: "Usage" -->
+<p>Do <code>reqruire "import-method"</code>, then <var>Module</var> has following methods:</p>
+<dl>
+<dt><a name="label-4" id="label-4"><code>import_module(<var>mod</var>) { ... }</code></a></dt><!-- RDLabel: "import_module" -->
+<dd>
+<p>Includes <var>mod</var> and executes ...</p>
+<p>(Example)</p>
+<pre>require "import-module"
+class Foo
+  def hello
+    puts 'hello'
+  end
+end
+
+module Bar
+  def hello
+    puts 'bye'
+  end
+end
+
+module Baz
+  def hello
+    puts 'good-bye'
+  end
+end
+
+foo = Foo.new
+foo.hello                   #=&gt; hello
+Foo.import_module(Bar) do
+  foo.hello                 #=&gt; bye
+  Foo.import_module(Baz) do
+    foo.hello               #=&gt; good-bye
+  end
+  foo.hello                 #=&gt; bye
+end
+foo.hello                   #=&gt; hello</pre></dd>
+<dt><a name="label-5" id="label-5"><code>adopt_module(<var>mod</var>)</code></a></dt><!-- RDLabel: "adopt_module" -->
+<dd>
+<p>Includes <var>mod</var>.</p>
+<p>(Example)</p>
+<pre>require "import-module"
+class Foo
+  def hello
+    puts 'hello'
+  end
+end
+
+module Bar
+  def hello
+    puts 'bye'
+  end
+end
+
+foo = Foo.new
+Foo.adopt_module(Bar)
+foo.hello                 #=&gt; bye</pre></dd>
+</dl>
+<p><var>Object</var> has following methods:</p>
+<dl>
+<dt><a name="label-6" id="label-6"><code>import(<var>mod</var>) { ... }</code></a></dt><!-- RDLabel: "import" -->
+<dd>
+<p>Extends an object by <var>mod</var>, and executes ...</p>
+<p>(Example)</p>
+<pre>require "import-module"
+class Foo
+  def hello
+    puts 'hello'
+  end
+end
+
+module Bar
+  def hello
+    puts 'bye'
+  end
+end
+
+foo = Foo.new
+bar = Foo.new
+foo.hello                   #=&gt; hello
+bar.hello                   #=&gt; hello
+foo.import(Bar) do |foo0|
+  foo.hello                 #=&gt; bye
+  p foo == foo0             #=&gt; true
+  bar.hello                 #=&gt; hello
+end
+foo.hello                   #=&gt; hello
+bar.hello                   #=&gt; hello</pre></dd>
+<dt><a name="label-7" id="label-7"><code>adopt(<var>mod</var>)</code></a></dt><!-- RDLabel: "adopt" -->
+<dd>
+<p>Extends an object by <var>mod</var>.</p>
+<p>(Example)</p>
+<pre>require "import-module"
+class Foo
+  def hello
+    puts 'hello'
+  end
+end
+
+module Bar
+  def hello
+    puts 'bye'
+  end
+end
+
+foo = Foo.new
+bar = Foo.new
+foo.adopt(Bar)
+foo.hello                   #=&gt; bye
+bar.hello                   #=&gt; hello</pre></dd>
+</dl>
+<h2><a name="label-8" id="label-8">Multi-threading</a></h2><!-- RDLabel: "Multi-threading" -->
+<p>This library can be used thread safely.</p>
+<p>(Example)</p>
+<pre>require "import-module"
+class Foo
+  def hello
+    puts 'hello'
+  end
+end
+
+module Bar
+  def hello
+    puts 'bye'
+  end
+end
+
+foo = Foo.new
+foo.hello #=&gt; hello
+Thread.start do
+  Foo.import_module(Bar) do
+    foo.hello #=&gt; bye
+  end
+end
+foo.hello #=&gt; hello</pre>
+<p>If you do not use multi-thread, 
+set <code>$import_module_single_thread = true</code> before 
+require <code>import-module.rb</code> or 
+use <code>import-module-single-thread.rb</code>
+instead of <code>import-module.rb</code>,
+then methods are invoked faster.</p>
+<h2><a name="label-9" id="label-9">Hint of Use</a></h2><!-- RDLabel: "Hint of Use" -->
+<h3><a name="label-10" id="label-10">Modify Enumerable</a></h3><!-- RDLabel: "Modify Enumerable" -->
+<p>Modify Enumerable module temporary:</p>
+<pre>require "import-module"
+module EachChar
+ def each(&amp;b); split(//).each(&amp;b); end
+end
+p "abc".import(EachChar){|s| s.map{|x| x.succ}}.join("") #=&gt; "bcd"</pre>
+<h3><a name="label-11" id="label-11">Determinant</a></h3><!-- RDLabel: "Determinant" -->
+<p>Treating the matrix over Integer as over Rational number.</p>
+<pre>require "import-module"
+require "matrix"
+require "rational"
+
+module RationalDiv
+  def /(other)
+    Rational(self) / other
+  end
+end
+
+a = Matrix[[2, 1], [3, 1]]
+puts a.det   #=&gt; 0
+Fixnum.import_module(RationalDiv) do
+  puts a.det #=&gt; -1
+end
+puts a.det   #=&gt; 0</pre>
+<h2><a name="label-12" id="label-12">Reference</a></h2><!-- RDLabel: "Reference" -->
+<p>In RAA <a href="http://www.ruby-lang.org/en/raa.html">&lt;URL:http://www.ruby-lang.org/en/raa.html&gt;</a>:</p>
+<ul>
+<li>Ruby Behaviors (David Alan Black)</li>
+<li>scope-in-state (Keiju Ishitsuka)</li>
+<li>class-in-state (Keiju Ishitsuka)</li>
+</ul>
+<h2><a name="label-13" id="label-13">Changes</a></h2><!-- RDLabel: "Changes" -->
+<p>0.82 (2005.02.02)</p>
+<ul>
+<li>id =&gt; object_id</li>
+</ul>
+<p>0.81 (2004.03.10)</p>
+<ul>
+<li>re-package</li>
+</ul>
+<p>0.80 (2003.06.29)</p>
+<ul>
+<li>adapted to 1.8.0(preview3)</li>
+<li>adapted to 1.6.8</li>
+</ul>
+<p>0.79 (2003.05.02)</p>
+<ul>
+<li>use $import_module_single_thread</li>
+<li>an installer is avalable.</li>
+</ul>
+<p>0.78 (2003.05.01)</p>
+<ul>
+<li>fix preserving attribute of method</li>
+</ul>
+<p>0.77 (2002.11.05)</p>
+<ul>
+<li>change proxy object from Hash to Array</li>
+</ul>
+<p>0.76 (2002.11.01)</p>
+<ul>
+<li>preserve &lt;&lt;protected&gt;&gt;</li>
+</ul>
+<p>0.75 (2002.10.31)</p>
+<ul>
+<li>implement set_orig_method</li>
+</ul>
+<p>0.74 (2002.10.30)</p>
+<ul>
+<li>Stack#update -&gt; Scope#update</li>
+<li>implement Stack#export_current</li>
+<li>renew test, test-import-module.rb test-time.rb</li>
+</ul>
+<p>0.73 (2002.10.28)</p>
+<ul>
+<li>change Stack</li>
+<li>abolish ImportModule#import_module_init</li>
+<li>Thread#__IMPORT_MODULE_PREFIX_proxy, stack</li>
+<li>test scripts changed</li>
+</ul>
+<p>0.72 (2002.10.22)</p>
+<ul>
+<li>implement Import_Module::Scope.create</li>
+<li>abolish Scope_module</li>
+</ul>
+<p>0.71 (2002.10.20)</p>
+<ul>
+<li>implement Scope_Module</li>
+<li>optimize: &amp;b -&gt; b -&gt; b -&gt; &amp;b</li>
+<li>abolish Import_Module.single_thread</li>
+<li>separate import-module-single-thread.rb</li>
+</ul>
+<p>0.70 (2002.10.17)</p>
+<ul>
+<li>Scope(Target, Source)</li>
+<li>import-module-pip.rb</li>
+<li>import-moudle-unbound-method.rb</li>
+</ul>
+<p>0.60 (2002.10.15)</p>
+<ul>
+<li>Separate Target, Source, Stack.</li>
+</ul>
+<p>0.60beta6 (2002.10.15)</p>
+<ul>
+<li>latest version of "PIP"</li>
+</ul>
+<p>0.52 (2002.10.10)</p>
+<ul>
+<li>re-difine target methods</li>
+<li>set "thread safe mode" default</li>
+<li>abolish "thread_safe"</li>
+<li>implement "single_thread_mode"</li>
+</ul>
+<p>0.51 (2002.10.09)</p>
+<ul>
+<li>send parameters directly (Import_Module)</li>
+</ul>
+<p>0.50 (2002.10.03)</p>
+<ul>
+<li>implement "proxy inheritance pattern" of scope-in-state (Import_Module)</li>
+<li>change stack from 'alias' to Array (Import_Module_Single_Thread)</li>
+<li>abolish '$IMPORT_MODULE_thread_safe'</li>
+<li>implement 'Import_Module.thread_safe'</li>
+<li>Stop 'Super'</li>
+</ul>
+
+</body>
+</html>
