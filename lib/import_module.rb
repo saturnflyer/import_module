@@ -1,3 +1,5 @@
+require "import_module/version"
+
 #  import-module.rb  ... create scope of methods by module
 #    by Shin-ichiro Hara
 #
@@ -53,7 +55,7 @@
 #$IMPORT_MODULE_debug = true
 
 ################################################################ kk
-module Import_Module
+module ImportModule
   IMPORT_MODULE_Version = "0.78beta1"
 
   module API
@@ -86,7 +88,7 @@ module Import_Module
     def set_orig_method(meth, orig)
       meth = meth.id2name if meth.is_a? Symbol
       orig = orig.id2name if orig.is_a? Symbol
-      meth0 = Import_Module.name(orig, :orig)
+      meth0 = ImportModule.name(orig, :orig)
       module_eval "def #{meth}(*a, &b); #{meth0}(*a, &b); end\n"
     end
   end
@@ -192,11 +194,11 @@ module Import_Module
       i = 0
       @target.scopes.each_key do |mod|
         s << (i == 0 ? "  " : "  els") << "if modid == #{mod.object_id}\n"
-        s << "    #{Import_Module.name(meth, mod)}(#{param})\n"
+        s << "    #{ImportModule.name(meth, mod)}(#{param})\n"
         i += 1
       end
       s << "  else\n" if i > 0
-      s << "    #{Import_Module.name(meth, :orig)}(#{param})\n"
+      s << "    #{ImportModule.name(meth, :orig)}(#{param})\n"
       s << "  end\n" if i > 0
       s << "end\n"
       s << "protected(:#{meth})\n" if @target.protecteds.include?(meth)
@@ -239,7 +241,7 @@ module Import_Module
       # Store original methods of the root class
       @klass.module_eval do
         meths.__each__ do |meth|
-          meth0 = Import_Module.name(meth, :orig)
+          meth0 = ImportModule.name(meth, :orig)
           alias_method meth0, meth
           public meth0 if pub_sw
         end
@@ -329,7 +331,7 @@ module Import_Module
       methods = @methods
       @mod.module_eval do
         methods.__each__ do |meth|
-          meth0 = Import_Module.name(meth, self)
+          meth0 = ImportModule.name(meth, self)
           unless method_defined? meth0
             alias_method meth0, meth
             public meth0 if true
@@ -379,7 +381,7 @@ end
 
 ################################################################ kk
 Module.module_eval do
-  include Import_Module::API
+  include ImportModule::API
 end
 
 class Thread
@@ -401,8 +403,8 @@ class << Thread
   alias fork new
 end
 
-Thread.current.__IMPORT_MODULE_PREFIX_stack = Import_Module::Stack.new([Array.new])
-#  Import_Module::Stack.new([Hash.new])
+Thread.current.__IMPORT_MODULE_PREFIX_stack = ImportModule::Stack.new([Array.new])
+#  ImportModule::Stack.new([Hash.new])
 
 class Object
   def import(mod)
