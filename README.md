@@ -8,7 +8,7 @@ See documents in the directory "doc".
 
 Add this line to your application's Gemfile:
 
-    gem 'import-module'
+    gem 'import_module'
 
 And then execute:
 
@@ -16,7 +16,7 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install import-module
+    $ gem install import_module
 
 ## Usage
 
