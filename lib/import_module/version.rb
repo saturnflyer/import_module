@@ -1,3 +1,3 @@
 module ImportModule
-  VERSION = "0.78beta1"
+  VERSION = "0.83"
 end

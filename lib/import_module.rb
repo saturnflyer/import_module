@@ -17,7 +17,7 @@ require "import_module/version"
 #
 #  Example:
 #
-#  require "import-module"
+#  require "import_module"
 #
 #  class Foo
 #    def hello
@@ -56,7 +56,6 @@ require "import_module/version"
 
 ################################################################ kk
 module ImportModule
-
   module API
     def import_module(mod)
       scope = adopt_module(mod) #not upper compatible
