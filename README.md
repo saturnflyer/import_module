@@ -1,4 +1,4 @@
-# Import::Module
+# ImportModule
 
 import_module by Shin-ichiro HARA (sinara@blade.nagaokatut.ac.jp)
 

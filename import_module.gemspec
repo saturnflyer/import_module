@@ -5,7 +5,7 @@ require 'import_module/version'
 
 Gem::Specification.new do |spec|
   spec.name          = "import_module"
-  spec.version       = Import::Module::VERSION
+  spec.version       = ImportModule::VERSION
   spec.authors       = ["Shin-ichiro HARA","Jim Gay"]
   spec.email         = ["sinara@blade.nagaokatut.ac.jp","jim@saturnflyer.com"]
   spec.description   = %q{incude modules dynamically}
