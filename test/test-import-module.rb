@@ -48,7 +48,7 @@ ARGV.delete_if do |x|
 end
 
 require $import_module
-#puts Import_Module::IMPORT_MODULE_Version
+#puts ImportModule::VERSION
 
 $N = 0
 def assert(m, n = nil)
@@ -109,7 +109,7 @@ module Second
   end
   assert(a.m, 0)
 end
-  
+
 # non existance
 module NonExistance
   module M021
@@ -216,7 +216,7 @@ module StarArg
     assert(a.f(0), 0)
     assert(a.g(0, 0), [0, 0])
   end
-end  
+end
 
 ##### inheritance
 module Inheritance
@@ -235,7 +235,7 @@ module Inheritance
   class Bar23 < Bar21
     def bar; 23; end
   end
-  
+
   o = Foo23.new
   u = Bar23.new
   Foo21.import_module(S22) do
@@ -289,13 +289,13 @@ module Private_Protected
     private :private_foo
     protected :protected_foo
   end
-  
+
   module Bar
     def public_foo; end
     def private_foo; end
     def protected_foo; end
   end
-  
+
   Foo.import_module(Bar) do
     assert(Foo.public_instance_methods(true).include?("public_foo"), true)
     assert(Foo.private_instance_methods(true).include?("private_foo"), true)
@@ -314,7 +314,7 @@ module Private_Proteced_Inheritance
     private :public_foo
     protected :private_foo
   end
-  
+
   module Bar
     def public_foo; end
     def private_foo; end
@@ -328,7 +328,7 @@ module Private_Proteced_Inheritance
     private :private_foo
     protected :protected_foo
   end
-  
+
   if RUBY_VERSION >= "1.7.0"
   Baz.import_module(Bar) do
     assert(Baz.public_instance_methods(true).include?("public_foo"), true)
@@ -355,7 +355,7 @@ module Private_Proteced_Inheritance
     private :private_foo
     protected :protected_foo
   end
-  
+
   module Bar
     def public_foo; end
     def private_foo; end
@@ -366,7 +366,7 @@ module Private_Proteced_Inheritance
 
   class Baz < Foo
   end
-  
+
   if RUBY_VERSION >= "1.7.0"
   Baz.import_module(Bar) do
     assert(Baz.public_instance_methods(true).include?("public_foo"), true)
@@ -553,7 +553,7 @@ module Super
     include MB1
     def f; [super, 2]; end
   end
-  
+
   class BB
     def f; 0; end
   end
@@ -581,11 +581,11 @@ module Super2
     end
   end
 
-# mapmap 
+# mapmap
 #  assert([10, 11, 12].import(Each_Index) {|s| s.map{|x| x}},
 #	 [[10, 0], [11, 2], [12, 4]]) unless $UNBOUND
   assert([10, 11, 12].map{|x| x}, [10, 11, 12]) unless $UNBOUND
-  
+
   module Each_Char
     def each(&b); split(//).each(&b); end
   end
@@ -650,7 +650,7 @@ module ScopeCreate
       2
     end
   end
-  
+
   class SC0
     def foo; 0; end
   end
@@ -660,8 +660,8 @@ module ScopeCreate
   module SM2
     def foo; 2; end
   end
-  s1 = Import_Module::Scope.create(SC0, SM1)
-  s2 = Import_Module::Scope.create(SC0, SM2)
+  s1 = ImportModule::Scope.create(SC0, SM1)
+  s2 = ImportModule::Scope.create(SC0, SM2)
   c = SC0.new
   assert(c.foo, 0)
   s1.activate do
@@ -674,7 +674,7 @@ module ScopeCreate
       assert(c.foo, 2)
     end
     assert(c.foo, 1)
-  end  
+  end
   assert(c.foo, 0)
 end
 
@@ -707,7 +707,7 @@ module MultiThreadNesting
     def m; 0; end
     def n; 0; end
   end
-  
+
   thrs = []
   o = B0mn.new
   thrs << Thread.start do
@@ -765,7 +765,7 @@ module DoNotErace
   end
   assert(o.m, 0)
   thrs.each do |th| th.join; end
-  
+
   class E2m
     def m; 2; end
   end
@@ -773,7 +773,7 @@ module DoNotErace
     def m; 3; end
   end
   o = E2m.new
-  
+
   thrs = []
   thrs << Thread.new do
     E2m.import_module(L3m) do
@@ -791,7 +791,7 @@ module ScopesInThreads
       0
     end
   end
-  
+
   module STM
     module M
       def f
@@ -878,7 +878,7 @@ module VariousTiming
   end
 end
 
-# Bottom Scope in Deep Thread 
+# Bottom Scope in Deep Thread
 module BottomScope
   class CN0m
     def m; 0; end
@@ -889,7 +889,7 @@ module BottomScope
   module N2m
     def m; 2; end
   end
-  
+
   o = CN0m.new
   thrs = []
   thrs << Thread.new do
@@ -909,7 +909,7 @@ module BottomScope
   end
   assert(o.m, 0)
   thrs.each do |th| th.join; end
-  
+
   # Many Thread
   class B0m
     def m; 0; end

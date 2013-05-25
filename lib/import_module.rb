@@ -56,7 +56,6 @@ require "import_module/version"
 
 ################################################################ kk
 module ImportModule
-  IMPORT_MODULE_Version = "0.78beta1"
 
   module API
     def import_module(mod)
